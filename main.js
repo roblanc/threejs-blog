@@ -1,11 +1,14 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
-let scene, camera, renderer, controls, stars;
+let scene, camera, renderer, controls, stars, sphere;
+let clock = new THREE.Clock();
 
 function init() {
+    // Create scene
     scene = new THREE.Scene();
 
+    // Setup camera
     camera = new THREE.PerspectiveCamera(
         75,
         window.innerWidth / window.innerHeight,
@@ -14,27 +17,31 @@ function init() {
     );
     camera.position.set(0, 0, 5);
 
+    // Renderer
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.getElementById("canvas-container").appendChild(renderer.domElement);
 
+    // Camera controls
     controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
 
+    // Add animated sphere object
     const geometry = new THREE.SphereGeometry(0.5, 32, 32);
     const material = new THREE.MeshStandardMaterial({ color: 0x00ffcc });
-    const sphere = new THREE.Mesh(geometry, material);
+    sphere = new THREE.Mesh(geometry, material);
     scene.add(sphere);
 
+    // Add lighting
     const light = new THREE.PointLight(0xffffff, 1, 100);
     light.position.set(5, 5, 5);
     scene.add(light);
 
-    createStarfield();
-    loadBlogPosts();
-    animate();
+    createStarfield();  // Background stars
+    animate();          // Start animation loop
 }
 
+// Function to create a moving starfield background
 function createStarfield() {
     stars = new THREE.Group();
     const starGeometry = new THREE.SphereGeometry(0.05, 8, 8);
@@ -52,34 +59,34 @@ function createStarfield() {
     scene.add(stars);
 }
 
+// Animation loop
 function animate() {
     requestAnimationFrame(animate);
-    controls.update();
+
+    // Get elapsed time
+    let elapsed = clock.getElapsedTime();
+
+    // Animate sphere floating up and down
+    sphere.position.y = Math.sin(elapsed) * 0.5;
+
+    // Rotate sphere
+    sphere.rotation.y += 0.01;
+    sphere.rotation.x += 0.005;
+
+    // Move stars slightly to create a drifting effect
     stars.rotation.y += 0.0005;
+    stars.rotation.x += 0.0003;
+
+    controls.update();
     renderer.render(scene, camera);
 }
 
-function loadBlogPosts() {
-    const blogPosts = [
-        { title: "The Future of AI", content: "AI is transforming the world of art, science, and daily life." },
-        { title: "Why I Love Three.js", content: "Three.js makes WebGL easy and fun for creating 3D experiences." },
-        { title: "The Digital Feudalism Era", content: "Are we all digital peasants in the age of Big Tech?" }
-    ];
-
-    const blogContainer = document.getElementById("blog-posts");
-
-    blogPosts.forEach(post => {
-        const postElement = document.createElement("div");
-        postElement.classList.add("blog-post");
-        postElement.innerHTML = `<h2>${post.title}</h2><p>${post.content}</p>`;
-        blogContainer.appendChild(postElement);
-    });
-}
-
+// Handle window resizing
 window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
+// Initialize the scene
 init();

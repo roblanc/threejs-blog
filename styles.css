@@ -23,16 +23,4 @@ body {
     background: rgba(0, 0, 0, 0.7);
     padding: 20px;
     border-radius: 10px;
-    text-align: center;
-}
-
-h1 {
-    font-size: 24px;
-}
-
-.blog-post {
-    background: rgba(255, 255, 255, 0.1);
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 5px;
-}
+    text-align: center
